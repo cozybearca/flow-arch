@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+  sdk:
+    build:
+      context: ..
+      dockerfile: sdk/Dockerfile
+      args:
+        - PROJ_NAME=${PROJ_NAME:?err}
+        - HOST_PORT_SPACE=${HOST_PORT_SPACE:?err}
+    image: ${SDK_IMAGE_PREFIX:?err}${PROJ_NAME:?err}-sdk:${SDK_TAG:?err}
+    container_name: ${PROJ_NAME:?err}-sdk
+    hostname: ${PROJ_NAME:?err}-sdk
+    ports:
+      - "${HOST_PORT_SPACE:?err}80:80" # dev server
+    environment:
+      - HOST_SDK_ROOT=${HOST_SDK_ROOT:?err}
+    volumes:
+      - ../:/${PROJ_NAME:?err}-sdk # required
+      - ${HOME:?err}/.ssh/:/root/.ssh:ro # required
+      - ./bin:/opt/bin # required
+      - ./.bashrc:/root/.bashrc # required
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.vscode-server
+      - type: tmpfs # to run googlechrome for testing
+        target: /dev/shm
